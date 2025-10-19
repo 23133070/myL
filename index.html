@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lá Thư Đặc Biệt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-decor">
+        <canvas id="falling-hearts" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1;pointer-events:none;"></canvas>
+        <div class="bg-heart h1">❤️</div>
+        <div class="bg-heart h2">💖</div>
+        <div class="bg-heart h3">💗</div>
+        <div class="bg-heart h4">💝</div>
+    </div>
+    <div class="container">
+        <h1>Lá Thư Đặc Biệt</h1>
+        <div id="envelope" class="envelope">
+            <img src="images/bia.jpg" alt="Lá thư" id="envelope-img">
+            <p>Bấm vào lá thư để mở</p>
+        </div>
+        <div id="letter-content" class="letter-content hidden">
+            <div class="letter-text">
+                <div style="font-size:2.2em; color:#e25555; margin-bottom: 8px;">❤️</div>
+                <h2 style="margin-bottom: 10px;">Gửi mập iu của Thái</h2>
+                <p id="main-message" style="text-align:center; font-size:1.15em; line-height:1.7; margin-bottom: 32px;">
+                    Chúc mập một ngày 20/10 vui vẻ. Luôn mãi là một người phụ nữ xinh đẹp trong lòng Thái.<br>
+                    Cảm ơn vì mập đã phải chịu đựng những điều k tốt hay những sai lầm trong quá khứ của Thái.<br>
+                    Hãy sống hết mình, làm những điều mà mập muốn, hãy cố gắng phát triển bản thân hơn, thành công hơn.<br><br>
+                    Nếu có một ngày nào đó, Thái được cơ hội yêu mập thêm lần nữa thì Thái sẽ hong bỏ qua bất kì một giây nào làm mập buồn hay phiền nàn.<br><br>
+                    <b>20/10 vui vẻ nha cô nàng nửa lòng Thái.</b>
+                </p>
+                <div class="img-bottom-right">
+                    <img id="letter-image" src="images/anh.jpg" alt="Ảnh kèm thư">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+    // Hiệu ứng trái tim rơi động, chỉ hiện khi chưa mở thư
+    const canvas = document.getElementById('falling-hearts');
+    const ctx = canvas.getContext('2d');
+    let hearts = [];
+    let running = true;
+    const heartEmojis = ['❤️','💖','💗','💝','💓'];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function randomHeart() {
+        return heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    }
+
+    function spawnHeart() {
+        const size = 28 + Math.random()*22;
+        hearts.push({
+            x: Math.random()*canvas.width,
+            y: -size,
+            size,
+            speed: 1.2 + Math.random()*1.8,
+            drift: (Math.random()-0.5)*0.7,
+            emoji: randomHeart(),
+            opacity: 0.7 + Math.random()*0.3
+        });
+    }
+
+    function drawHearts() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for (let h of hearts) {
+            ctx.save();
+            ctx.globalAlpha = h.opacity;
+            ctx.font = `${h.size}px serif`;
+            ctx.shadowColor = '#e25555';
+            ctx.shadowBlur = 8;
+            ctx.fillText(h.emoji, h.x, h.y);
+            ctx.restore();
+        }
+    }
+
+    function updateHearts() {
+        for (let h of hearts) {
+            h.y += h.speed;
+            h.x += h.drift;
+        }
+        hearts = hearts.filter(h => h.y < canvas.height + 40);
+    }
+
+    function animate() {
+        if (!running) return;
+        if (Math.random() < 0.18) spawnHeart();
+        updateHearts();
+        drawHearts();
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Ẩn hiệu ứng khi mở thư
+    document.getElementById('envelope').addEventListener('click', function() {
+        running = false;
+        canvas.style.display = 'none';
+    });
+    </script>
+</body>
+</html>
